@@ -3,6 +3,7 @@
 Spyder Editor
 
 This is a temporary script file.
+
 """
 
 
@@ -22,7 +23,7 @@ from sklearn.metrics import mean_squared_error
 from math import sqrt
 from sklearn.ensemble import RandomForestRegressor
 import itertools
-
+from sklearn.inspection import permutation_importance
 
 
 
@@ -51,6 +52,24 @@ rgr = RandomForestRegressor(max_depth=2, random_state=0)
 rgr.fit(X,y)
 y_pred = rgr.predict(X)
 # print(rgr.predict([[0, 0, 0]]))
+
+result = permutation_importance(
+    rgr,
+    X,
+    y,
+    n_repeats=10,
+    random_state=42,
+    n_jobs=2)
+
+feature_names = list(d.columns)[0:3]
+forest_importances = pd.Series(result.importances_mean, index=feature_names)
+
+fig, ax = plt.subplots()
+forest_importances.plot.bar(yerr=result.importances_std, ax=ax)
+ax.set_title("Feature importances using permutation on full model")
+ax.set_ylabel("Mean accuracy decrease")
+fig.tight_layout()
+plt.show()
 
 # -------------------------------------------------------------
 #
